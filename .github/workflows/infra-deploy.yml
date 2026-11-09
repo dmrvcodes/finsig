@@ -94,6 +94,25 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
+      - name: Log OIDC claim shape for trust-policy repair
+        run: |
+          python3 - <<'PY'
+          import base64
+          import json
+          import os
+          import urllib.request
+
+          request = urllib.request.Request(
+              f"{os.environ['ACTIONS_ID_TOKEN_REQUEST_URL']}&audience=sts.amazonaws.com",
+              headers={"Authorization": f"Bearer {os.environ['ACTIONS_ID_TOKEN_REQUEST_TOKEN']}"},
+          )
+          with urllib.request.urlopen(request) as response:
+              token = json.load(response)["value"]
+          payload = token.split(".")[1]
+          claims = json.loads(base64.urlsafe_b64decode(payload + "=" * (-len(payload) % 4)))
+          keys = ("aud", "sub", "repository", "repository_id", "ref", "event_name", "workflow_ref", "job_workflow_ref")
+          print(json.dumps({key: claims.get(key) for key in keys}, sort_keys=True))
+          PY
       - uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.2.1
         with:
           role-to-assume: arn:aws:iam::623588627433:role/finsig/FinSig_admin
