@@ -22,7 +22,7 @@ glass cards and dense, chart-led widgets.
 `BarChart` (selectable months with a floating value pill), `AreaChart` (monotone cubic line with
 gradient fill and hover readout), `Gauge`, `Donut`, `Sparkline` and a horizontal `Waterfall` that
 floats each step from the running total so the bridge reconciles visually. The transactions ledger
-uses AG Grid Community on the same tokens (see below); the report builder uses AG Studio.
+uses AG Grid Community on the same tokens (see below); the income investigation runs on AG Studio.
 
 ## Package boundary
 
@@ -31,7 +31,7 @@ uses AG Grid Community on the same tokens (see below); the report builder uses A
 `kit/` contains FinSig compositions: `Card`, `StatCard`, and `DataTable`. `charts/` contains the SVG charts. `DataTable` uses
 TanStack Table for application workflows and supports sorting, global filtering, persisted column
 visibility, persisted widths, resizing, a sticky first column, and row actions. It is not used as a
-substitute for AG Studio; AG Studio owns the interactive report-building surface.
+substitute for AG Studio; AG Studio owns the income investigation and its editor.
 
 All exported components use `fs-` prefixed classes. `styles.css` defines the public token contract;
 applications import it once through `@finsig/ui/styles.css`.
@@ -39,7 +39,7 @@ applications import it once through `@finsig/ui/styles.css`.
 ## AG Grid ledger
 
 AG Grid has one job: the transactions ledger (`src/features/workspace/Transactions.tsx`). The
-dashboard stays card- and chart-led, and AG Studio stays the separate report builder, so neither
+dashboard stays card- and chart-led, and AG Studio stays the income investigation, so neither
 grows a second table.
 
 - **Theme.** `gridTheme` passes the `--fs-*` CSS variables straight into `themeQuartz.withParams`,
@@ -65,9 +65,11 @@ grows a second table.
 
 ## AG Studio mapping
 
-`src/features/studio/theme.ts` maps the same tokens into `studioTheme.withParams`: canvas, widgets,
-panels, grid headers and rows, charts, focus, typography and radius all match the application shell.
-The custom bridge widget deliberately uses the package CSS variables rather than a second palette.
+`src/features/studio/theme.ts` passes the same `--fs-*` tokens into `studioTheme.withParams`:
+widgets, panels, grid headers and rows, focus, typography and radius match the application shell.
+The wrapper and canvas are transparent, so the investigation sits on the app background. The
+custom bridge widget uses the package CSS variables rather than a second palette. Chart palettes
+stay literal colours because AG Charts draws on a canvas. See `docs/ag-studio.md`.
 
 ## Rules
 
